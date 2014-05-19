@@ -1052,6 +1052,9 @@ if __name__ == '__main__':
     parser.add_option("--out", dest="output", action='append',
                       metavar="DEVICE[,BAUD]", help="MAVLink output port and optional baud rate",
                       default=[])
+    parser.add_option("--out_read", dest="output_readonly", action='append',
+                      metavar="DEVICE[,BAUD]", help="MAVLink output port and optional baud rate",
+                      default=[])
     parser.add_option("--baudrate", dest="baudrate", type='int',
                       help="default serial baud rate", default=115200)
     parser.add_option("--sitl", dest="sitl",  default=None, help="SITL output port")
@@ -1175,6 +1178,16 @@ Auto-detected serial ports are:
             port, baud = p, opts.baudrate
 
         mpstate.mav_outputs.append(mavutil.mavlink_connection(port, baud=int(baud), input=False))
+        
+     # open any mavlink UDP ports read only Ben Dellar
+    for p in opts.output_readonly:
+        if ',' in p and not os.path.exists(p):
+            port, baud = p.split(',')            
+        else:
+            port, baud = p, opts.baudrate
+
+        mpstate.mav_outputs.append(mavutil.mavlink_connection(port, baud=int(baud), input=False))
+
 
     if opts.sitl:
         mpstate.sitl_output = mavutil.mavudp(opts.sitl, input=False)
